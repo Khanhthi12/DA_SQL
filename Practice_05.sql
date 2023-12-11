@@ -7,6 +7,11 @@ WHERE id%2=0;
 SELECT (COUNT(CITY)- COUNT(DISTINCT CITY))
 FROM STATION;
 
+--EX03
+SELECT 
+CEILING (AVG(salary) - AVG(REPLACE(salary, '0','')))
+FROM EMPLOYEES
+
 --EX04
 SELECT 
 ROUND(CAST(SUM (order_occurrences * item_count) / SUM(order_occurrences) AS DECIMAL),1)
