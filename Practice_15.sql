@@ -53,16 +53,24 @@ WHERE a.rank = 1
 GROUP BY a.transaction_date,a.user_id
 
 --EX05 ( Em chạy bị lỗi nhờ anh chị sửa lại giùm em nhé)
+WITH cte AS 
+(
+  SELECT 
+    user_id, 
+    tweet_date,
+    tweet_count,
+    LAG(tweet_count, 1, 0) OVER(PARTITION BY user_id ORDER BY tweet_date) AS day1,
+    LAG(tweet_count, 2, 0) OVER(PARTITION BY user_id ORDER BY tweet_date) AS day2
+  FROM tweets
+)
 SELECT 
-  a.user_id,
-  a.tweet_date, 
-  ROUND(AVG(b.tweet_count),2)
-FROM tweets As a
-INNER JOIN tweets b ON a.user_id = b.user_id
-WHERE 
-  a.tweet_date >= b.tweet_date AND (a.tweet_date - b.tweet_date) < 3
-GROUP BY a.user_id, b.tweet_date
-ORDER BY a.user_id, a.tweet_date
+  user_id, 
+  tweet_date,
+  ROUND(1.0*(tweet_count +  day1 + day2)/
+  (1 + 
+  CASE WHEN day1 > 0 THEN 1 ELSE 0 END +
+  CASE WHEN day2 > 0 THEN 1 ELSE 0 END),2) 
+  AS rolling
   
 --EX06
 WITH cte AS 
